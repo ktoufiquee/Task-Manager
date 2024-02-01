@@ -43,6 +43,20 @@ public class UserController {
         return authenticatedUser.getUsername() != null;
     }
 
+    @GetMapping("/api/username")
+    public String getUsername(HttpServletRequest request) {
+        authenticateToken.extractToken(request);
+        return authenticatedUser.getUsername();
+    }
+
+    @DeleteMapping("/api/logout")
+    public boolean logout(HttpServletRequest request) {
+        authenticateToken.extractToken(request);
+        Token token = tokenRepository.findByUsername(authenticatedUser.getUsername());
+        tokenRepository.delete(token);
+        return true;
+    }
+
     @PostMapping("/api/login")
     public ResponseEntity<String> login(@RequestBody Map<String, String> body) {
 

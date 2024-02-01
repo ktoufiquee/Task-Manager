@@ -1,10 +1,10 @@
 # Installation Guide
 
-1. Create a schema in MySQL eg: taskamangerdb
+1. Create a schema in MySQL eg: taskmanagerdb
 2. Clone the repository.
 3. Set following values in ***src/main/resources/application.properties***:
 ```
-spring.datasource.url=	//mysql database url eg: jdbc:mysql://localhost:3306/taskmanagerdb (Note: here taskamangerdb is the schema created in Step 1)
+spring.datasource.url=	//mysql database url eg: jdbc:mysql://localhost:3306/taskmanagerdb (Note: here taskmanagerdb is the schema created in Step 1)
 spring.datasource.username=		//mysql database username
 spring.datasource.password=		//mysql database password
 webserver.origin=		//endpoint for web (fronted) eg: http://127.0.0.1:5050

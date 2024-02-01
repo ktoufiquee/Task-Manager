@@ -28,7 +28,8 @@ public class AuthenticateToken {
             UUID uuid = UUID.fromString(token);
             String username = tokenRepository.findByToken(uuid).getUsername();
             authenticatedUser.setUsername(username);
-        } else {
+        }
+        else {
             authenticatedUser.setUsername(null);
         }
     }

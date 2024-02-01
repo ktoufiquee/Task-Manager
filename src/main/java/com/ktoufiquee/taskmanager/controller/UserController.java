@@ -43,26 +43,19 @@ public class UserController {
         return authenticatedUser.getUsername() != null;
     }
 
-    @GetMapping("/user/{username}")
-    public User getUser(@PathVariable("username") String username) {
-        return repository.findById(username).get();
-    }
-
     @PostMapping("/user/login")
     public ResponseEntity<String> login(@RequestBody Map<String, String> body) {
 
         var username = body.get("username");
         var password = body.get("password");
 
-        if (authenticatedUser.getUsername() != null) {
-            return ResponseEntity.ok(tokenRepository.findByUsername(username).getToken().toString());
-        }
-
         if (repository.findById(username).isPresent()) {
             if (repository.findById(username).get().getPassword().equals(password)) {
                 if (tokenRepository.findByUsername(username) != null) {
                     return ResponseEntity.ok(tokenRepository.findByUsername(username).getToken().toString());
-                } else {
+                }
+                else {
+                    tokenRepository.deleteAll(tokenRepository.findAllByUsername(username));
                     Token token = new Token(username);
                     return ResponseEntity.ok(tokenRepository.save(token).getToken().toString());
                 }

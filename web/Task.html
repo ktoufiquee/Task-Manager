@@ -6,8 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JSON Table Example</title>
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.4/dist/sweetalert2.all.min.js"></script>
-    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.4/dist/sweetalert2.min.css" rel="stylesheet">
+    <script type="text/javascript" src="./config.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -133,7 +132,7 @@
 
         function getUsername() {
             $.ajax({
-                url: 'http://localhost:8080/api/username',
+                url: config.endpoint + '/api/username',
                 method: 'GET',
                 headers: {
                     Authorization: 'Bearer ' + authToken
@@ -147,7 +146,7 @@
 
         function logout() {
             $.ajax({
-                url: 'http://localhost:8080/api/logout',
+                url: config.endpoint + '/api/logout',
                 method: 'DELETE',
                 headers: {
                     Authorization: 'Bearer ' + authToken
@@ -166,7 +165,7 @@
         function authenticate() {
             if (!isEmpty(authToken)) {
                 $.ajax({
-                    url: 'http://localhost:8080/api/authenticate',
+                    url: config.endpoint + '/api/authenticate',
                     method: 'GET',
                     headers: {
                         Authorization: 'Bearer ' + authToken
@@ -196,7 +195,7 @@
             };
 
             $.ajax({
-                url: 'http://localhost:8080/api/tasks',
+                url: config.endpoint + '/api/tasks',
                 type: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify(jsonData),
@@ -243,7 +242,7 @@
         function deleteTask(id) {
             console.log(id);
             $.ajax({
-                url: 'http://localhost:8080/api/tasks/' + id,
+                url: config.endpoint + '/api/tasks/' + id,
                 type: 'DELETE',
                 contentType: 'application/json',
                 data: JSON.stringify({ taskid: id }),
@@ -263,7 +262,7 @@
             console.log(id);
             var stat = status ? 1 : 0;
             $.ajax({
-                url: 'http://localhost:8080/api/tasks/' + id,
+                url: config.endpoint + '/api/tasks/' + id,
                 type: 'PATCH',
                 contentType: 'application/json',
                 data: JSON.stringify({ status: stat }),
@@ -280,7 +279,7 @@
         }
 
         $.ajax({
-            url: 'http://localhost:8080/api/tasks',
+            url: config.endpoint + '/api/tasks',
             type: 'GET',
             headers: {
                 Authorization: 'Bearer ' + authToken

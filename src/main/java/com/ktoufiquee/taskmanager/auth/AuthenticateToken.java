@@ -25,6 +25,10 @@ public class AuthenticateToken {
         String authorizationHeader = request.getHeader("Authorization");
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             String token = authorizationHeader.substring(7);
+            if (token.length() < 2) {
+                authenticatedUser.setUsername(null);
+                return;
+            }
             UUID uuid = UUID.fromString(token);
             String username = tokenRepository.findByToken(uuid).getUsername();
             authenticatedUser.setUsername(username);

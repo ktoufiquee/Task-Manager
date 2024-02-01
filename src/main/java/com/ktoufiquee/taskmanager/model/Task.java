@@ -1,6 +1,8 @@
 package com.ktoufiquee.taskmanager.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
+import org.springframework.boot.context.properties.bind.DefaultValue;
 
 @Entity
 @Table(name = "task")
@@ -9,15 +11,19 @@ public class Task {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer taskid;
     private Integer status;
-    private String details;
+    @Size(min = 1, max = 1024)
+    private String description;
+    @Size(min = 1, max = 256)
+    private String title;
     private String username;
 
     public Task() {}
 
-    public Task(Integer taskid, Integer status, String details, String username) {
+    public Task(Integer taskid, Integer status, String description, String title, String username) {
         this.taskid = taskid;
         this.status = status;
-        this.details = details;
+        this.description = description;
+        this.title = title;
         this.username = username;
     }
 
@@ -37,12 +43,12 @@ public class Task {
         this.status = status;
     }
 
-    public String getDetails() {
-        return details;
+    public String getDescription() {
+        return description;
     }
 
-    public void setDetails(String details) {
-        this.details = details;
+    public void setDescription(String details) {
+        this.description = details;
     }
 
     public String getUsername() {
@@ -51,5 +57,13 @@ public class Task {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 }

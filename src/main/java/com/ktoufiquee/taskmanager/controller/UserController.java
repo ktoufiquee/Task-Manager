@@ -37,13 +37,13 @@ public class UserController {
         this.authenticateToken = authenticateToken;
     }
 
-    @GetMapping("/user/authenticate")
+    @GetMapping("/api/authenticate")
     public boolean getAuthentication(HttpServletRequest request) {
         authenticateToken.extractToken(request);
         return authenticatedUser.getUsername() != null;
     }
 
-    @PostMapping("/user/login")
+    @PostMapping("/api/login")
     public ResponseEntity<String> login(@RequestBody Map<String, String> body) {
 
         var username = body.get("username");
@@ -65,7 +65,7 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid");
     }
 
-    @PostMapping("/user")
+    @PostMapping("/api/register")
     public User createUser(@Valid @RequestBody User user) {
         return repository.save(user);
     }

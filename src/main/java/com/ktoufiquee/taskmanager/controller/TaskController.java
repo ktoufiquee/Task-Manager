@@ -5,7 +5,6 @@ import com.ktoufiquee.taskmanager.auth.AuthenticatedUser;
 import com.ktoufiquee.taskmanager.model.Task;
 import com.ktoufiquee.taskmanager.repository.TaskRepository;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,7 +25,7 @@ public class TaskController {
         this.authenticatedUser = authenticatedUser;
     }
 
-    @GetMapping("/task")
+    @GetMapping("/api/tasks")
     public ResponseEntity<List<Task>> getAllTask(HttpServletRequest request) {
 
         authenticateToken.extractToken(request);
@@ -38,7 +37,7 @@ public class TaskController {
         return ResponseEntity.ok(repository.findAllByUsername(username));
     }
 
-    @PatchMapping("/task/{taskid}")
+    @PatchMapping("/api/tasks/{taskid}")
     public ResponseEntity<Task> patchTask(@PathVariable Integer taskid, @RequestBody Map<String, String> body, HttpServletRequest request) {
 
         var status = Integer.parseInt(body.get("status"));
@@ -58,10 +57,12 @@ public class TaskController {
         return ResponseEntity.internalServerError().body(null);
     }
 
-    @PostMapping("/task")
+    @PostMapping("/api/tasks")
     public ResponseEntity<Task> createTask(@RequestBody Map<String, String> body, HttpServletRequest request) {
 
         var details = body.get("details");
+        var title = body.get("title");
+
         authenticateToken.extractToken(request);
         var username = authenticatedUser.getUsername();
         if (username == null) {
@@ -70,8 +71,26 @@ public class TaskController {
 
         Task task = new Task();
         task.setStatus(0);
-        task.setDetails(details);
+        task.setDescription(details);
+        task.setTitle(title);
         task.setUsername(username);
         return ResponseEntity.ok(repository.save(task));
+    }
+
+    @DeleteMapping("/api/tasks/{taskid}")
+    public ResponseEntity<String> deleteTask(@PathVariable Integer taskid, HttpServletRequest request) {
+
+        authenticateToken.extractToken(request);
+        var username = authenticatedUser.getUsername();
+        if (username == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+        }
+
+        if (repository.findById(taskid).isPresent()) {
+            var task = repository.findById(taskid).get();
+            repository.delete(task);
+        }
+
+        return ResponseEntity.ok("Deleted");
     }
 }

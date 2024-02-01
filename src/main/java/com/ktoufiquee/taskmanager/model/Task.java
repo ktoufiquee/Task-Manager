@@ -10,13 +10,15 @@ public class Task {
     private Integer taskid;
     private Integer status;
     private String details;
+    private String username;
 
     public Task() {}
 
-    public Task(Integer taskid, Integer status, String details) {
+    public Task(Integer taskid, Integer status, String details, String username) {
         this.taskid = taskid;
         this.status = status;
         this.details = details;
+        this.username = username;
     }
 
     public Integer getTaskid() {
@@ -43,4 +45,11 @@ public class Task {
         this.details = details;
     }
 
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
 }

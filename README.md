@@ -30,4 +30,9 @@ endpoint: \\this value will be the endpoint the server is using eg: http://local
 |api/tasks |{taskid: "", title: "", description: "", status: "", username: ""} | {taskid: "", title: "", description: "", status: "", username: ""}| POST |
 |api/tasks/{taskid} | | | DELETE |
 
+# Screenshots
+<img src="/screenshots/Screenshot 2024-02-01 122558.png" alt="image" width="300" height="auto"> <br>
+<img src="/screenshots/Screenshot 2024-02-01 123247.png" alt="image" width="300" height="auto"> <br>
+<img src="/screenshots/Screenshot 2024-02-01 123314.png" alt="image" width="300" height="auto"> <br>
+<img src="/screenshots/Screenshot 2024-02-01 123417.png" alt="image" width="300" height="auto"> <br>
 

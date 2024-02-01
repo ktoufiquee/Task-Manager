@@ -9,6 +9,7 @@ import com.ktoufiquee.taskmanager.repository.TokenRepository;
 import com.ktoufiquee.taskmanager.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -64,7 +65,7 @@ public class UserController {
         var password = body.get("password");
 
         if (repository.findById(username).isPresent()) {
-            if (repository.findById(username).get().getPassword().equals(password)) {
+            if (BCrypt.checkpw(password, repository.findById(username).get().getPassword())) {
                 if (tokenRepository.findByUsername(username) != null) {
                     return ResponseEntity.ok(tokenRepository.findByUsername(username).getToken().toString());
                 }
@@ -81,6 +82,9 @@ public class UserController {
 
     @PostMapping("/api/register")
     public User createUser(@Valid @RequestBody User user) {
+        var og_password = user.getPassword();
+        var enc_password = BCrypt.hashpw(og_password, BCrypt.gensalt());
+        user.setPassword(enc_password);
         return repository.save(user);
     }
 

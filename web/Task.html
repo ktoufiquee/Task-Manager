@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON Table Example</title>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.4/dist/sweetalert2.all.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.4/dist/sweetalert2.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f0f0f0;
+        }
+
+        form {
+            min-width: 250px;
+            width: 750px;
+            margin-bottom: 20px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        form input {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            box-sizing: border-box;
+        }
+
+        form button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4caf50;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        form button:hover {
+            background-color: #45a049;
+        }
+
+        table {
+            max-width: 800px;
+            width: 100%;
+            margin-top: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th,
+        td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #4caf50;
+            color: #fff;
+        }
+
+        td {
+            vertical-align: middle;
+        }
+
+        input[type="checkbox"] {
+            margin-right: 8px;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #0b800f;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #3e8042;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <h1>Hello <span id='username'></span><button onclick="logout()">Log Out</button></h1>
+
+    <form id="loginForm">
+        <input type="text" name="title" placeholder="Title" id="title" required>
+        <input type="text" name="details" placeholder="Description" id="details" required>
+        <button type="submit" onclick="submitTask()">Save</button>
+    </form>
+
+
+    <table id="jsonTable">
+        <thead>
+            <tr>
+                <th>Status</th>
+                <th>Details</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+
+
+
+    <script>
+        var authToken = localStorage.getItem('authToken');
+
+        document.addEventListener('DOMContentLoaded', authenticate, false);
+
+        document.addEventListener('DOMContentLoaded', getUsername, false);
+
+        function getUsername() {
+            $.ajax({
+                url: 'http://localhost:8080/api/username',
+                method: 'GET',
+                headers: {
+                    Authorization: 'Bearer ' + authToken
+                },
+                success: function (response) {
+                    console.log(response);
+                    $('#username').text(response);
+                }
+            });
+        }
+
+        function logout() {
+            $.ajax({
+                url: 'http://localhost:8080/api/logout',
+                method: 'DELETE',
+                headers: {
+                    Authorization: 'Bearer ' + authToken
+                },
+                success: function (response) {
+                    localStorage.removeItem('authToken');
+                    window.location.href = 'Start.html';
+                }
+            });
+        }
+
+        function isEmpty(value) {
+            return (value == null || (typeof value === "string" && value.trim().length === 0));
+        }
+
+        function authenticate() {
+            if (!isEmpty(authToken)) {
+                $.ajax({
+                    url: 'http://localhost:8080/api/authenticate',
+                    method: 'GET',
+                    headers: {
+                        Authorization: 'Bearer ' + authToken
+                    },
+                    success: function (token) {
+                        console.log(token);
+                        if (token == false) {
+                            window.location.href = 'Start.html';
+                        }
+                    }
+                });
+            }
+            else {
+                window.location.href = 'Start.html';
+            }
+        }
+
+
+        function submitTask() {
+
+            var title = $('#title').val();
+            var details = $('#details').val();
+
+            var jsonData = {
+                title: title,
+                details: details
+            };
+
+            $.ajax({
+                url: 'http://localhost:8080/api/tasks',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(jsonData),
+                headers: {
+                    Authorization: 'Bearer ' + authToken
+                },
+                success: function (response) {
+                    console.log(response);
+                    createTable(response);
+                }
+            });
+        }
+
+        function createTable(jsonData) {
+            var tableBody = $('#jsonTable tbody');
+
+            jsonData.forEach(function (item) {
+                var row = $('<tr>');
+
+                var checkbox = $('<input type="checkbox">');
+                checkbox.prop('checked', item.status != 0);
+                checkbox.on('change', function () {
+                    updateStatus(item.taskid, checkbox.prop('checked'));
+                });
+
+                var button = $('<button>', {
+                    text: 'Remove',
+                    click: function () {
+                        deleteTask(item.taskid);
+                    }
+                });
+
+                var paragraph = document.createElement("div");
+                paragraph.innerHTML = '<p><b>' + item.title + '</b><br>' + item.description + '</p>';
+
+                row.append($('<td>').append(checkbox));
+                row.append($('<td>').append(paragraph));
+                row.append($('<td>').append(button));
+
+                tableBody.append(row);
+            });
+        }
+
+        function deleteTask(id) {
+            console.log(id);
+            $.ajax({
+                url: 'http://localhost:8080/api/tasks/' + id,
+                type: 'DELETE',
+                contentType: 'application/json',
+                data: JSON.stringify({ taskid: id }),
+                headers: {
+                    Authorization: 'Bearer ' + authToken
+                },
+                success: function (response) {
+                    location.reload();
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.log(jqXHR);
+                }
+            });
+        }
+
+        function updateStatus(id, status) {
+            console.log(id);
+            var stat = status ? 1 : 0;
+            $.ajax({
+                url: 'http://localhost:8080/api/tasks/' + id,
+                type: 'PATCH',
+                contentType: 'application/json',
+                data: JSON.stringify({ status: stat }),
+                headers: {
+                    Authorization: 'Bearer ' + authToken
+                },
+                success: function (response) {
+                    console.log(response);
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.log(jqXHR);
+                }
+            });
+        }
+
+        $.ajax({
+            url: 'http://localhost:8080/api/tasks',
+            type: 'GET',
+            headers: {
+                Authorization: 'Bearer ' + authToken
+            },
+            success: function (data) {
+                console.log(data);
+                createTable(data);
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                console.error('Error fetching data:', jqXHR);
+            }
+        });
+    </script>
+
+</body>
+
+</html>

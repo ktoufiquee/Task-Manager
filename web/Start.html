@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            max-width: 800px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .login,
+        .signup {
+            flex: 1;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .login {
+            order: 1;
+        }
+
+        .signup {
+            order: 2;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                flex-direction: column;
+                max-width: 100%;
+            }
+
+            .login,
+            .signup {
+                order: initial;
+            }
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #0b800f;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #3e8042;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="login">
+            <h2>Login</h2>
+            <form id="loginForm">
+                <input type="text" name="username" placeholder="Username" id="l_username" required>
+                <input type="password" name="password" placeholder="Password" id="l_password" required>
+                <button type="submit" onclick="submitLogin()">Login</button>
+            </form>
+        </div>
+        <div class="signup">
+            <h2>Signup</h2>
+            <form id="signupForm">
+                <input type="text" name="username" placeholder="Username" id="s_username" required>
+                <div class="error-message" id="error_username" style="font-size: 0.9rem; color: tomato;"></div>
+
+                <input type="text" name="mail" placeholder="Email" id="s_mail" required>
+                <div class="error-message" id="error_mail" style="font-size: 0.9rem; color: tomato;"></div>
+
+                <input type="password" name="password" placeholder="Password" id="s_password" required>
+                <div class="error-message" id="error_password" style="font-size: 0.9rem; color: tomato;"></div>
+
+                <input type="password" name="confirm_password" placeholder="Confirm Password" id="s_cpass" required>
+                <div class="error-message" id="error_cpass" style="font-size: 0.9rem; color: tomato;"></div>
+
+                <button type="submit" onclick="submitSignup()">Sign Up</button>
+            </form>
+        </div>
+    </div>
+</body>
+
+<script>
+    var authToken = localStorage.getItem('authToken');
+
+    document.addEventListener('DOMContentLoaded', authenticate, false);
+
+    function isEmpty(value) {
+        return (value == null || (typeof value === "string" && value.trim().length === 0));
+    }
+
+    function authenticate() {
+
+        if (!isEmpty(authToken)) {
+            $.ajax({
+                url: 'http://localhost:8080/api/authenticate',
+                method: 'GET',
+                headers: {
+                    Authorization: 'Bearer ' + authToken
+                },
+                success: function (token) {
+                    console.log(token);
+                    if (token == true) {
+                        window.location.href = 'Task.html';
+                    }
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                }
+            });
+        }
+    }
+
+    $('#loginForm').submit(function (e) {
+        e.preventDefault();
+    });
+
+    $('#signupForm').submit(function (e) {
+        e.preventDefault();
+    });
+
+    function submitLogin() {
+
+        var username = $('#l_username').val();
+        var password = $('#l_password').val();
+
+        var jsonData = {
+            username: username,
+            password: password
+        };
+
+        $.ajax({
+            url: 'http://localhost:8080/api/login',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(jsonData),
+            headers: {
+                Authorization: 'Bearer ' + authToken
+            },
+            success: function (token) {
+                localStorage.setItem('authToken', token);
+                window.location.href = 'Task.html';
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Oops...",
+                    text: "Invalid Login Information!",
+                });
+            }
+        });
+    }
+
+    function submitSignup() {
+        var username = $('#s_username').val();
+        var mail = $('#s_mail').val();
+        var password = $('#s_password').val();
+        var c_password = $('#s_cpass').val();
+
+        if (password != c_password) {
+            $('#error_cpass').text('Password do not match!');
+            return;
+        }
+
+        $('#error_username').text('');
+        $('#error_mail').text('');
+        $('#error_password').text('');
+
+        var jsonData = {
+            username: username,
+            mail: mail,
+            password: password
+        };
+
+        console.log(1);
+        console.log(jsonData);
+
+        var data = JSON.stringify(jsonData);
+
+        console.log(data);
+
+
+        $.ajax({
+            url: 'http://localhost:8080/api/register',
+            method: 'POST',
+            contentType: 'application/json',
+            data: data,
+            success: function (response) {
+                Swal.fire({
+                    icon: "success",
+                    title: "Successfully Registered!",
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+
+                $('#s_username').val('');
+                $('#s_mail').val('');
+                $('#s_password').val('');
+                $('#s_cpass').val('');
+
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+
+                for (var [key, val] of Object.entries(jqXHR.responseJSON)) {
+                    console.log(key);
+                    console.log(val);
+                    if (key == 'username') {
+                        $('#error_username').text(val);
+                    }
+
+                    if (key == 'mail') {
+                        $('#error_mail').text(val);
+                    }
+
+                    if (key == 'password') {
+                        $('#error_password').text(val);
+                    }
+                }
+            }
+        });
+    }
+</script>
+
+
+</html>

@@ -1,5 +1,11 @@
 # Installation Guide
 
+Following version of the software/tools were used in developing this project:
+1. JDK 17
+2. MySQL 8.3
+3. Spring Boot 3.2.2
+
+Follow the instruction below for installation:
 1. Create a schema in MySQL eg: taskmanagerdb
 2. Clone the repository.
 3. Set following values in ***src/main/resources/application.properties***:
@@ -17,11 +23,6 @@ endpoint: \\this value will be the endpoint the server is using eg: http://local
 ```
 6. Start a server on web directory. (How to: [Link 1 (Using VS Code) Tested](https://www.geeksforgeeks.org/how-to-enable-live-server-on-visual-studio-code/)], [Link 2 Not Tested)](https://attacomsian.com/blog/local-web-server) )
 7. Start the application using ***web_endpoint/Start.html*** eg: 127.0.0.1:5050/Start.html
-
-Following version of the software/tools were used:
-1. JDK 17
-2. MySQL 8.3
-3. Spring Boot 3.2.2
 
 # API Documentation
 | endpoint |  receiving value | return value | Method |
